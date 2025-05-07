@@ -1,4 +1,5 @@
 package maruBatsuGame;
+//実行クラス
 //環境作成
 public class game_play {
 
