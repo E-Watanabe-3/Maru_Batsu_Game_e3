@@ -1,10 +1,19 @@
 package maruBatsuGame;
-
+//環境作成
 public class game_play {
 
 	public static void main(String[] args) {
-		// TODO 自動生成されたメソッド・スタブ
-
+		System.out.println("〇×ゲームへようこそ");
+		
+	
+		
+		
+		
+		
+		
+		System.out.println("ゲームを終了します");
 	}
 
 }
+
+

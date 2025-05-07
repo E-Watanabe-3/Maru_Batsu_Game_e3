@@ -14,7 +14,7 @@ public class demo_play {
         System.out.print("選択：");
         int cpuLevel = scanner.nextInt(); // ユーザーが1か2を入力
 
-        // ゲームの本体クラスを作成（プレイヤーがX、CPUがO）
+        // ゲームの本体クラスを作成）（プレイヤーがX、CPUがO）
         demo_plan game = new demo_plan('X', 'O');
 
         // ゲームループ（勝敗がつくまで繰り返す）
