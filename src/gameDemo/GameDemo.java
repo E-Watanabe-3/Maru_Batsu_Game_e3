@@ -1,151 +1,187 @@
 package gameDemo;
 
-import java.util.Random;
-import java.util.Scanner;
+import java.util.Random;//CPUがランダムな動きをする
+import java.util.Scanner;//キーボードの入力を受け付ける
 
 public class GameDemo {
-    private static final char EMPTY = ' '; // 空のマス
-    private static final char PLAYER = 'X'; // プレイヤーの記号
-    private static final char CPU = 'O'; // CPUの記号
-    private static char[][] board = new char[3][3]; // 盤面
-    private static boolean hardMode = false; // CPUの強さ（trueなら強い）
+
+    // 盤面：3×3 の文字配列
+    static char[][] board = {
+        {' ', ' ', ' '},
+        {' ', ' ', ' '},
+        {' ', ' ', ' '}
+    };
+
+    static char playerMark = 'X';//プレイヤー
+    static char cpuMark = 'O';//コンピューター
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);//キーボードの入力を受け付ける
 
-        // ゲーム開始時の設定
-        System.out.println("〇×ゲームへようこそ！");
-        System.out.println("CPUの強さを選択してください (1: 普通, 2: 強い): ");
-        int difficulty = scanner.nextInt();
-        hardMode = (difficulty == 2); // 2なら強いモード
+        // スタート画面を表示
+        printStartScreen();//CPU強さの選択1or2
+        int cpuLevel = scanner.nextInt();//キーボードの数値を受ける1or2
 
-        initializeBoard(); // 盤面を空にする
-        playGame(scanner); // ゲーム開始
-    }
+        boolean gameEnded = false;//ゲームが終了したかどうかを判断、falseなら続行
 
-    // 盤面を初期化（すべて空にする）
-    private static void initializeBoard() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = EMPTY;
+        // メインゲームループ
+        while (!gameEnded) {//ゲームが終了したかどうかを判断、falseなら続行
+            printBoard(); // 現在の盤面を表示
+
+            // プレイヤーの手番
+            playerTurn(scanner);
+            if (checkWin(playerMark)) {//指定したマークが３つ並んでいるか調べる
+                printBoard();
+                System.out.println("🎉 プレイヤーの勝ち！");
+                break;//ループを抜ける
             }
-        }
-    }
+            if (isBoardFull()) {//空きマスがない → 引き分け
+                printBoard();
+                System.out.println("🤝 引き分け！");
+                break;
+            }
 
-    // ゲームの流れ（プレイヤーとCPUのターン）
-    private static void playGame(Scanner scanner) {
-        boolean gameRunning = true; // ゲームが続いているか
-        boolean playerTurn = true; // プレイヤーの番かどうか
-
-        while (gameRunning) {
-            printBoard(); // 盤面を表示
-            
-            if (playerTurn) {
-                // プレイヤーの操作
-                System.out.println("あなたの番です。1〜9の番号を入力してください:");
-                int choice = scanner.nextInt();
-                int row = (choice - 1) / 3;
-                int col = (choice - 1) % 3;
-
-                if (isValidMove(row, col)) {
-                    board[row][col] = PLAYER;
-                    playerTurn = false; // 次はCPUの番
-                } else {
-                    System.out.println("無効な手です。もう一度入力してください。");
-                    continue;
-                }
+            // CPUの手番（選んだレベルに応じて動作）
+            if (cpuLevel == 1) {
+                cpuTurnEasy();//ランダム
             } else {
-                // CPUの操作
-                cpuMove();
-                playerTurn = true; // 次はプレイヤーの番
+                cpuTurnHard();//ブロック、勝ち狙い
             }
 
-            // 勝敗判定
-            if (checkWin(PLAYER)) {
+            if (checkWin(cpuMark)) {//指定したマークが３つ並んでいるか調べる
                 printBoard();
-                System.out.println("あなたの勝利！");
-                gameRunning = false;
-            } else if (checkWin(CPU)) {
+                System.out.println("🤖 CPUの勝ち！");
+                break;
+            }
+            if (isBoardFull()) {//空きマスがない → 引き分け
                 printBoard();
-                System.out.println("CPUの勝利！");
-                gameRunning = false;
-            } else if (isDraw()) {
-                printBoard();
-                System.out.println("引き分け！");
-                gameRunning = false;
+                System.out.println("🤝 引き分け！");
+                break;
             }
         }
-        scanner.close();
+
+        scanner.close();//ゲームが終了したら、入力を閉じる
     }
 
-    // CPUの動き（普通モードはランダム、強いモードは最適な手）
-    private static void cpuMove() {
-        Random random = new Random();
-
-        if (!hardMode) { // 普通モード（ランダムに選ぶ）
-            int row, col;
-            do {
-                row = random.nextInt(3);
-                col = random.nextInt(3);
-            } while (!isValidMove(row, col));
-            board[row][col] = CPU;
-        } else { // 強いモード（勝てる手を探す）
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (board[i][j] == EMPTY) {
-                        board[i][j] = CPU;
-                        if (checkWin(CPU)) return;
-                        board[i][j] = EMPTY;
-                    }
-                }
-            }
-            int row, col;
-            do {
-                row = random.nextInt(3);
-                col = random.nextInt(3);
-            } while (!isValidMove(row, col));
-            board[row][col] = CPU;
-        }
+    // 🔰 ゲーム開始時の表示とレベル選択
+    public static void printStartScreen() {
+        System.out.println("=== 〇×ゲーム（プレイヤー vs CPU） ===");
+        System.out.println("CPUの強さを選んでください：");
+        System.out.println("1: 弱いCPU（ランダム）");
+        System.out.println("2: 強いCPU（ブロック＋勝ち筋）");
+        System.out.print("選択：");
     }
 
-    // 盤面を表示（〇×のみ）
-    private static void printBoard() {
-        System.out.println(" ------------- ");
+    // 🧱 現在の盤面を表示（空きマスには 1〜9 の番号を表示）
+    public static void printBoard() {
+        System.out.println("-------------");
+        int count = 1; // 1〜9の番号をつけるためのカウンタ
         for (int i = 0; i < 3; i++) {
-            System.out.print(" | ");
+            System.out.print("| ");
             for (int j = 0; j < 3; j++) {
-                System.out.print(board[i][j] + " | ");
+                if (board[i][j] == ' ') {
+                    System.out.print(count + " | ");
+                } else {
+                    System.out.print(board[i][j] + " | ");
+                }
+                count++;
             }
             System.out.println();
-            System.out.println(" ------------- ");
+            System.out.println("-------------");
         }
     }
 
-    // 有効な手かチェック（空いているマスかどうか）
-    private static boolean isValidMove(int row, int col) {
-        return row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == EMPTY;
+    // 🎮 プレイヤーのターン（番号入力 → マスに変換）
+    public static void playerTurn(Scanner scanner) {
+        int cell;
+        while (true) {
+            System.out.println("あなたの番です。1〜9の番号を入力してください。");
+            System.out.print("番号：");
+            cell = scanner.nextInt();
+
+            if (cell < 1 || cell > 9) {
+                System.out.println("⚠ 1〜9の数字を入力してください。");
+                continue;
+            }
+
+            // ユーザーが１～９を入力、配列の行・列に変換する
+            int row = (cell - 1) / 3;
+            int col = (cell - 1) % 3;
+
+            if (board[row][col] == ' ') {
+                board[row][col] = playerMark;
+                break;
+            } else {
+                System.out.println("⚠ そのマスはすでに埋まっています。");
+            }
+        }
     }
 
-    // 勝敗の判定（縦・横・斜めのどこか揃ったら勝ち）
-    private static boolean checkWin(char player) {
+    // CPU（レベル1）：ランダムに空いているマスに置く
+    public static void cpuTurnEasy() {
+        Random rand = new Random();
+        int row, col;
+        System.out.println("CPU（レベル1）の番です。");
+        while (true) {
+            row = rand.nextInt(3);//0~2のランダムな数を作って、空いている場所におく
+            col = rand.nextInt(3);//よわいCPU↑
+            if (board[row][col] == ' ') {
+                board[row][col] = cpuMark;
+                break;
+            }
+        }
+    }
+
+    // CPU（レベル2）：勝てる or 相手をブロックする or ランダム
+    public static void cpuTurnHard() {
+        System.out.println("CPU（レベル2）の番です。");
         for (int i = 0; i < 3; i++) {
-            if (board[i][0] == player && board[i][1] == player && board[i][2] == player) return true;
-            if (board[0][i] == player && board[1][i] == player && board[2][i] == player) return true;
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == ' ') {
+                    // 勝てる手を試す
+                    board[i][j] = cpuMark;
+                    if (checkWin(cpuMark)) return;
+
+                    // 相手が勝ちそうなら防ぐ
+                    board[i][j] = playerMark;
+                    if (checkWin(playerMark)) {
+                        board[i][j] = cpuMark;
+                        return;
+                    }
+
+                    // どちらでもないなら元に戻す
+                    board[i][j] = ' ';
+                }
+            }
         }
-        if (board[0][0] == player && board[1][1] == player && board[2][2] == player) return true;
-        if (board[0][2] == player && board[1][1] == player && board[2][0] == player) return true;
+
+        // ランダムに置く（他になければ）
+        cpuTurnEasy();
+    }
+
+    // 勝利条件を判定（縦・横・斜め）
+    public static boolean checkWin(char mark) {
+        for (int i = 0; i < 3; i++) {
+            // 横 or 縦のチェック
+            if ((board[i][0] == mark && board[i][1] == mark && board[i][2] == mark) ||
+                (board[0][i] == mark && board[1][i] == mark && board[2][i] == mark)) {
+                return true;
+            }
+        }
+        // 斜めのチェック
+        if ((board[0][0] == mark && board[1][1] == mark && board[2][2] == mark) ||
+            (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark)) {
+            return true;
+        }
+
         return false;
     }
 
-    // 引き分けの判定（すべて埋まっていたら引き分け）
-    private static boolean isDraw() {
-        for (char[] row : board) {
-            for (char cell : row) {
-                if (cell == EMPTY) {
-                    return false;
-                }
-            }
-        }
+    // 盤面が埋まっているかどうか
+    public static boolean isBoardFull() {
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (board[i][j] == ' ') return false;
         return true;
     }
 }
