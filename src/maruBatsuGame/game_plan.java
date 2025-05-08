@@ -1,50 +1,94 @@
 package maruBatsuGame;
-//設計図クラス
-public class game_plan {
-//ゲームのルール
+
+//ゲームのルール（トグル
 //要件
-//1.盤面は3 × 3
+//1.盤面は3 × 3ok
 
 //2.先に一列揃えたプレイヤーの勝利
 //3.プレイヤー vs CPU（どっちが○か×かは問わない）
 //4.CPUの強さを2段階で選択可能
+
 //実装手順(目安)
 //1.環境作成
+//2.ゲーム開始画面と終了処理を作るok
+//3.３×３の画面表示を作るok
 
-//2.ゲーム開始画面と終了処理を作る
-//3.３×３の画面表示を作る
 //4.1Pと2Pで交互にマスを埋めるようにする
 //5.勝利判定を実装する
 //6.2P側をCPUにして、適当に置くようにする
 //7CPUを強くする
 
+import java.util.Scanner;//入力できる
 
-	//①3x3盤面を表示
-	public class GameBoard {
-		public static void main(String[] args) {
-			char[][] board = new char[3][3];
+public class game_plan {
+	private static char[][] board = new char[3][3];//2次元配列、3x3盤面
+	private static char player = '○'; //４．初期プレイヤー〇追加
 
-			// 初期化（すべてのマスを空白に）
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					board[i][j] = ' ';
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in); //キーボード入力を受け付けるように
+		initializeBoard();
+
+		//１．ゲーム開始画面を表示
+		System.out.println("〇×ゲームにようこそ！");
+		System.out.println("プレイヤーの番、番号を入力してください：");
+
+		//４．交互に入力
+		while(true) {  //入力継続ループ
+			
+			System.out.println("プレイヤー " + (player == '○' ? "1P（○）" : "2P（×）") + " の番。（番号1～9）：");
+			int move; //
+			while(true) { //プレイヤーのターン
+				try {
+					move = Integer.parseInt(scanner.nextLine()) - 1; //文字列を整数に変換。キーボード入力を取得、0~8
+					int row =move / 3;
+					int col = move % 3;
+					if (move < 0 || move >= 9 || board[row][col] == '○' || board[row][col] == '×') {//1~9以外は再入力
+						System.out.println("無効な入力です。もう一度選んでください：");
+					} else {
+						board[row][col] = player; //現在の〇×
+						break;
+					}
+				} catch(NumberFormatException e) {
+					System.out.println("数字を入力してください：");
 				}
 			}
+			printBoard(board);//盤面呼び出し
+			
+			
+			
+			
+			player = (player == '○') ? '×' : '○'; //〇×交代
 
-			// 盤面を表示するメソッド
-			printBoard(board);
-		}
-
-		public static void printBoard(char[][] board) {
-			System.out.println("-------------");
-			for (int i = 0; i < 3; i++) {
-				System.out.print("| ");
-				for (int j = 0; j < 3; j++) {
-					System.out.print(board[i][j] + " | ");
-				}
-				System.out.println();
-				System.out.println("-------------");
-			}
+			scanner.close();
+			//２．ゲーム終了画面を表示
+			System.out.println("〇×ゲームを終了しました。");
 		}
 	}
-}
+
+	// 盤面初期化（マスを空白に）
+	private static void initializeBoard() {
+		int count = 1;
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				board[i][j] = (char)('0' + count); //1~9の番号を表示
+				count++;
+			}
+		}
+		//３．盤面を画面表示する呼び出し
+		printBoard(board);
+
+	}
+
+	//盤面を画面表示する
+	public static void printBoard(char[][] board) {
+		System.out.println("-------------");
+		for (int i = 0; i < 3; i++) {
+			System.out.print("| ");
+			for (int j = 0; j < 3; j++) {
+				System.out.print(board[i][j] + " | ");
+			}
+			System.out.println();
+			System.out.println("-------------");	}
+		}
+	}
+
