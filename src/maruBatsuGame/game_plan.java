@@ -18,12 +18,17 @@ package maruBatsuGame;
 //6.2P側をCPUにして、適当に置くようにする
 //7CPUを強くする
 
-import java.util.Scanner;//入力できる
+import java.util.Scanner;//入力を受付
 
 public class game_plan {
-	private static char[][] board = new char[3][3];//2次元配列、3x3盤面
-	private static char player = '○'; //４．初期プレイヤー〇追加
+	private static char[][] array = new char[3][3];//3x3盤面をchar型配列で宣言。2次元配列=[][]である
 
+	
+	private static char player = '○'; //Playerに"〇"を代入
+
+	
+	
+	
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in); //キーボード入力を受け付けるように
 		initializeBoard();
@@ -42,17 +47,17 @@ public class game_plan {
 					move = Integer.parseInt(scanner.nextLine()) - 1; //文字列を整数に変換。キーボード入力を取得、0~8
 					int row =move / 3;
 					int col = move % 3;
-					if (move < 0 || move >= 9 || board[row][col] == '○' || board[row][col] == '×') {//1~9以外は再入力
+					if (move < 0 || move >= 9 || array[row][col] == '○' || array[row][col] == '×') {//1~9以外は再入力
 						System.out.println("無効な入力です。もう一度選んでください：");
 					} else {
-						board[row][col] = player; //現在の〇×
+						array[row][col] = player; //現在の〇×
 						break;
 					}
 				} catch(NumberFormatException e) {
 					System.out.println("数字を入力してください：");
 				}
 			}
-			printBoard(board);//盤面呼び出し
+			printBoard(array);//盤面呼び出し
 			
 			
 			
@@ -70,22 +75,22 @@ public class game_plan {
 		int count = 1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				board[i][j] = (char)('0' + count); //1~9の番号を表示
+				array[i][j] = (char)('0' + count); //1~9の番号を表示
 				count++;
 			}
 		}
 		//３．盤面を画面表示する呼び出し
-		printBoard(board);
+		printBoard(array);
 
 	}
 
-	//盤面を画面表示する
-	public static void printBoard(char[][] board) {
+	//3x3盤面を配列で表示
+	public static void printBoard(char[][] array) {
 		System.out.println("-------------");
 		for (int i = 0; i < 3; i++) {
 			System.out.print("| ");
 			for (int j = 0; j < 3; j++) {
-				System.out.print(board[i][j] + " | ");
+				System.out.print(array[i][j] + " | ");
 			}
 			System.out.println();
 			System.out.println("-------------");	}
