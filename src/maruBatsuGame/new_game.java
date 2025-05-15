@@ -78,6 +78,10 @@ public class new_game{
         }
     }
 }
-
-
-
+//勝敗チェック
+/*public static void check(int[][] masu) {
+    for(int i = 0; i < 3; i++) {//3行と3列を確認
+        if(masu[i][0] == masu[i][1] && masu[i][1] == masu[i][2]) }//横
+            return masu[i][0];
+        }
+}*/
