@@ -12,10 +12,10 @@ public class new_game{
         // １．ゲーム開始
         System.out.println("OXゲーム");
 
-        // ２．表示（枠線と数字）の3x3盤面初期化
-        int[][] masu = new int[3][3]; // 3x3 の二次元配列
-        int num = 1; // 番号初期値
-        for (int i = 0; i < 3; i++) {
+        // ２．表示（枠線と数字）3x3盤面初期化
+        int[][] masu = new int[3][3]; //二次元配列をint型で3x3定義
+        int num = 1; //int型で初期値１～９の値
+        for(int i = 0; i < 3; i++){ //盤面カウント123,456,789
             for (int j = 0; j < 3; j++) {
                 masu[i][j] = num++;
             }
@@ -48,7 +48,7 @@ public class new_game{
                 if (input) break;
             }
 
-            if (!input) {
+            if (!input) { //!異なる入力値
                 System.out.println("無効な入力です、他の番号を入力してください：");
                 continue;
             }
