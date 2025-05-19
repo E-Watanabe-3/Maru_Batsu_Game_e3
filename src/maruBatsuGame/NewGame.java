@@ -1,16 +1,15 @@
 package maruBatsuGame;
-//実装
-//5.勝利判定を実装する
-//6.2P側をCPUにして、適当に置くようにする
-//7CPUを強くする
 
+import java.util.Random; //ランダム入力
 import java.util.Scanner; //外部入力
+
 
 public class NewGame{
 
     //クラスにfinal修飾子の定数宣言し配列数を3x3指定(マジックナンバー対策)
     private static final int VERTICAL = 3; //盤面縦の行数
     private static final int HORIZONTAL = 3; //盤面横の列数
+    //private static final Random random = new Random(); //COMランダム
 
     public static void main(String[] args) {
         // １．ゲーム開始
@@ -31,25 +30,33 @@ public class NewGame{
         Scanner scanner = new Scanner(System.in); // 入力機能
         //int playerTurn = 1; // 1=O、2=X
         boolean isPlayerTurn = true; //OvsX->2名のみ=boolean型true(O)/false(X)の2種で管理が容易
-        //ゲームのループ
+        //４．ゲームのループ
         while (true) {
             //三項演算子（変数A = B > C ? true : false）でif文が省略できる
             System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの番です。");
-            System.out.println("番号1～9を入力しましょう。（0=強制終了）");
-            System.out.print("番号：");
-            int inputNum = scanner.nextInt(); // 外部入力受付、プレイヤーが入力する数字
-            if (inputNum == 0) { // 0を入力すると強制終了
-                System.out.println("＝〇×ゲームを強制終了しました＝");
+            int inputNum = 0;
+            if(isPlayerTurn){
+                System.out.println("番号1～9を入力しましょう。（0=強制終了）");
+                System.out.print("番号：");
+                inputNum = scanner.nextInt(); // 外部入力受付、プレイヤーが入力する数字
+                //６．COMの操作
+            } else { //プレイヤーが入力しないターンの時
+                inputNum = getRandomCom(masu, isPlayerTurn); //COMが値を代入
+                System.out.println("COMは、"+ inputNum + "を選択しました。") ;
+
+            }
+            if(inputNum == 0) { // 0を入力すると強制終了
+                System.out.println("＝ゲームを強制終了しました＝");
                 break; //whileループ停止
             }
             //入力+入力判定の呼び出しと、値が無効な場合の処理
-            if (!tryPlace(masu, inputNum, isPlayerTurn)) { //!異なる入力値の場合
+            if(!tryPlace(masu, inputNum, isPlayerTurn)) { //!異なる入力値の場合
                 System.out.println("無効な入力です、他の番号を入力してください：");
                 continue; //ループのスタート地点へ
             }
             printBoard(masu); //盤面表示
 
-            if(checkWiner(masu)) {//勝ち判定メソッド呼び出ししたら、
+            if(checkWinner(masu)) {//勝ち判定メソッド呼び出ししたら、
                 //if(checkWiner(masu)) {
                 System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの勝ちです。");
                 System.out.println("＝〇×ゲームを通常終了しました＝");
@@ -65,8 +72,37 @@ public class NewGame{
         }
         scanner.close(); // 入力受付終了
     }
+    //６．CPU追加途中
+    public static int getRandomCom(int[][] masu, boolean isPlayerTurn) {
+        Random random = new Random();
+        int count = 0;
+        // 空いているマスの数を数える
+        for (int i = 0; i < masu.length; i++) {
+            for (int j = 0; j < masu[i].length; j++) {
+                if (masu[i][j] != -1 && masu[i][j] != -2) { // OXが入っていないマス
+                    count++; // 空いているマスの総数をカウント
+                }
+            }
+        }
+        if (count == 0) return 0; // 全マス埋まっていたらゲーム終了
+
+        int target = random.nextInt(count); // ランダムに空いているマスを選ぶ
+        for (int i = 0; i < masu.length; i++) {
+            for (int j = 0; j < masu[i].length; j++) {
+                if (masu[i][j] != -1 && masu[i][j] != -2) { // OXが入っていないマス
+                    if (count == target) { // ランダムに選ばれたマスなら配置
+                        masu[i][j] = -2; // CPUの手（×）を配置
+                        return (i * 3)+(j + 1); // CPUが選んだ番号を返す
+                    }
+                    count++;
+                }
+            }
+        }
+        return(0); //すべて埋まっていた場合*/
+    }
+
     //５．勝ちチェックメソッド
-    public static boolean checkWiner(int[][] masu) {
+    public static boolean checkWinner(int[][] masu) {
         //揃った＝勝ち
         for(int i = 0; i < 3; i++) {
             if(masu[i][0] == masu[i][1] && masu[i][1] == masu[i][2] ){ //横
