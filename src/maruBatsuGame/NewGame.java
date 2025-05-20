@@ -1,15 +1,12 @@
 package maruBatsuGame;
 
-import java.util.Random; //ランダム入力
 import java.util.Scanner; //外部入力
-
 
 public class NewGame{
 
     //クラスにfinal修飾子の定数宣言し配列数を3x3指定(マジックナンバー対策)
-    private static final int VERTICAL = 3; //盤面縦の行数
+    private static final int VERTICAL = 3; //盤面縦の行数_定数へ要素数代入
     private static final int HORIZONTAL = 3; //盤面横の列数
-    //private static final Random random = new Random(); //COMランダム
 
     public static void main(String[] args) {
         // １．ゲーム開始
@@ -18,9 +15,9 @@ public class NewGame{
         // ２．表示（枠線と数字）3x3盤面初期化
         int[][] masu = new int[VERTICAL][HORIZONTAL]; //2次元配列[][]=定数代入
 
-        int num = 1; //int型で初期値１～９の値
-        for(int i = 0; i < masu.length; i++){ //盤面行_変数.length=配列の要素数(ループ回数)を自動反映
-            for (int j = 0; j < masu.length; j++) { //盤面列_同様
+        int num = 1; //int型で初期値１
+        for(int i = 0; i < masu.length; i++){ //盤面縦行_変数.length=配列の要素数(ループ回数)を取得
+            for (int j = 0; j < masu[i].length; j++) { //盤面横列_同様
                 masu[i][j] = num++; //num値をmasuへ代入
             }
         }
@@ -39,19 +36,35 @@ public class NewGame{
                 System.out.println("番号1～9を入力しましょう。（0=強制終了）");
                 System.out.print("番号：");
                 inputNum = scanner.nextInt(); // 外部入力受付、プレイヤーが入力する数字
+
+/*
+                try {
+                    if (inputNum >= 0 && inputNum <= 9) {
+                        break;
+                    } else {
+                    }
+                }catch(Exception e) {
+                    System.out.println("無効な入力です、数字1～9を入力してください。");
+                    scanner.next(); // 入力をクリアして再試行
+                }
+*/                
+
                 //６．COMの操作
             } else { //プレイヤーが入力しないターンの時
-                inputNum = getRandomCom(masu, isPlayerTurn); //COMが値を代入
+                inputNum = getWeakCom(masu, isPlayerTurn); //COMが値を代入
                 System.out.println("COMは、"+ inputNum + "を選択しました。") ;
-
             }
             if(inputNum == 0) { // 0を入力すると強制終了
                 System.out.println("＝ゲームを強制終了しました＝");
                 break; //whileループ停止
             }
+            if(inputNum == -99) { //-99が入力された場合
+                System.out.println("＝COMは置く場所がないため、ゲームを終了しました＝");
+                break;
+            }
             //入力+入力判定の呼び出しと、値が無効な場合の処理
             if(!tryPlace(masu, inputNum, isPlayerTurn)) { //!異なる入力値の場合
-                System.out.println("無効な入力です、他の番号を入力してください：");
+                System.out.println("無効な入力です、他の番号を入力してください。");
                 continue; //ループのスタート地点へ
             }
             printBoard(masu); //盤面表示
@@ -68,43 +81,28 @@ public class NewGame{
                 System.out.println("＝〇×ゲームを通常終了しました＝");
                 break;
             }
-            isPlayerTurn = !isPlayerTurn; //!=倫理否定演算子で反転しターン交代
+            isPlayerTurn = !isPlayerTurn; //!=倫理否定演算子でfalseで返す=ターン交代
         }
         scanner.close(); // 入力受付終了
     }
-    //６．CPU追加途中
-    public static int getRandomCom(int[][] masu, boolean isPlayerTurn) {
-        Random random = new Random();
-        int count = 0;
-        // 空いているマスの数を数える
-        for (int i = 0; i < masu.length; i++) {
-            for (int j = 0; j < masu[i].length; j++) {
-                if (masu[i][j] != -1 && masu[i][j] != -2) { // OXが入っていないマス
-                    count++; // 空いているマスの総数をカウント
+    //６．順番に置く弱いCOMを追加
+    public static int getWeakCom(int[][] masu, boolean isPlayerTurn) {
+        if(checkDraw(masu)) { //COMが置けない場合は引き分け判定へ
+            return -99;
+        }
+        for(int i = 0; i < masu.length; i++) {
+            for(int j = 0; j < masu[i].length; j++) {
+                if(masu[i][j] != -1 && masu[i][j] != -2) { //O(-1),X(-2)以外ならば
+                    return masu[i][j]; //マス番号を戻す
                 }
             }
         }
-        if (count == 0) return 0; // 全マス埋まっていたらゲーム終了
-
-        int target = random.nextInt(count); // ランダムに空いているマスを選ぶ
-        for (int i = 0; i < masu.length; i++) {
-            for (int j = 0; j < masu[i].length; j++) {
-                if (masu[i][j] != -1 && masu[i][j] != -2) { // OXが入っていないマス
-                    if (count == target) { // ランダムに選ばれたマスなら配置
-                        masu[i][j] = -2; // CPUの手（×）を配置
-                        return (i * 3)+(j + 1); // CPUが選んだ番号を返す
-                    }
-                    count++;
-                }
-            }
-        }
-        return(0); //すべて埋まっていた場合*/
+        return -99; //来ないはず
     }
-
     //５．勝ちチェックメソッド
     public static boolean checkWinner(int[][] masu) {
         //揃った＝勝ち
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < masu.length; i++) {
             if(masu[i][0] == masu[i][1] && masu[i][1] == masu[i][2] ){ //横
                 return true;
             }
@@ -122,8 +120,8 @@ public class NewGame{
     }
     //５．引き分けチェックメソッド
     public static boolean checkDraw(int[][] masu) {
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
+        for(int i = 0; i < masu.length; i++) {
+            for(int j = 0; j < masu[i].length; j++) {
                 if(masu[i][j] != -1 && masu[i][j] != -2) { //OXではない
                     return false; //1個でも空白があれば引き分けはしない=return
                 }
@@ -146,14 +144,14 @@ public class NewGame{
     //２．盤面表示メソッド
     public static void printBoard(int[][] masu) {
         System.out.println("+---+---+---+");
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                if (masu[x][y] == -1) { //-1であれば| 〇にする
+        for (int i = 0; i < masu.length; i++) {
+            for (int j = 0; j < masu[i].length; j++) {
+                if (masu[i][j] == -1) { //-1であれば| 〇にする
                     System.out.print("| O ");
-                } else if (masu[x][y] == -2) { //-2であれば| ×にする
+                } else if (masu[i][j] == -2) { //-2であれば| ×にする
                     System.out.print("| X ");
                 } else {
-                    System.out.print("| " + masu[x][y] + " ");//何も代入なければ初期表示
+                    System.out.print("| " + masu[i][j] + " ");//何も代入なければ初期表示
                 }
             }
             System.out.println("|"); //マスの右端を|でとじる
@@ -161,3 +159,4 @@ public class NewGame{
         }
     }
 }
+
