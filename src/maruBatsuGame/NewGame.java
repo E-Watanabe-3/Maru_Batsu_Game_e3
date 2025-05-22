@@ -11,11 +11,9 @@ public class NewGame {
     private static final int PLAYER_O = -1;
     private static final int PLAYER_X = -2;
 
-    
-    
     //mainメソッド
     public static void main(String[] args) {
-      //３．入力受付
+        //３．入力受付
         Scanner scanner = new Scanner(System.in);
         do { //do内でゲーム進行
             gameBox(scanner);
@@ -40,11 +38,11 @@ public class NewGame {
         printBoard(masu); // masu代入処理後の盤面表示
 
         //９．先攻1or後攻2の選択
-        int selectTurn = selectOption(scanner,"先攻/後攻を選択して下さい。\n先攻：１\n後攻：２", 1, 2);
+        int selectTurn = selectOption(scanner, "先攻/後攻を選択して下さい。\n先攻：１\n後攻：２", 1, 2);
         boolean isPlayerChoice = (selectTurn == 1); //true先攻
         boolean isPlayerTurn = isPlayerChoice; //最初のターンを代入true/false
         //８．COM難易度1or2の選択
-        int selectCom = selectOption(scanner,"\nCOMの難易度を選択して下さい。\n簡単：１\n難しい：２",1 ,2);
+        int selectCom = selectOption(scanner, "\nCOMの難易度を選択して下さい。\n簡単：１\n難しい：２", 1, 2);
         System.out.println("\n＝ゲームを開始します＝");
         printBoard(masu);
 
@@ -59,7 +57,7 @@ public class NewGame {
                 System.out.print("番号：");
                 inputNum = scanner.nextInt(); //外部入力受付、プレイヤーが入力する数字
                 scanner.nextLine();
-            //６．COMの処理
+                //６．COMの処理
             } else {
                 if (selectCom == 1) { //COMの難易度を決める
                     inputNum = getWeakCom(masu, isPlayerTurn); //弱いCOM=1選択時
@@ -86,7 +84,7 @@ public class NewGame {
             if (checkWinner(masu, isPlayerTurn ? PLAYER_O : PLAYER_X)) { //true(-1):false(-2)=O:X
                 System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの勝ちです！");
                 break;
-            }//引き分け判定の呼び出し
+            } //引き分け判定の呼び出し
             if (checkDraw(masu)) {
                 System.out.println("引き分けです。");
                 break;
@@ -94,38 +92,36 @@ public class NewGame {
             isPlayerTurn = !isPlayerTurn; //!=倫理否定演算子でfalseで返しターン交代
         }
     }
-    
+
     //１０．再戦メソッド
     private static boolean playAgain(Scanner scanner) {
-        while(true) {
+        while (true) {
             System.out.print("\n再戦しますか？\n(Y/N)：");
             String retry = scanner.nextLine();
-            if("Y".equalsIgnoreCase(retry)) {//.equalsIgnoreCase()大文字小文字区別しない(YyNn)
+            if ("Y".equalsIgnoreCase(retry)) {//.equalsIgnoreCase()大文字小文字区別しない(YyNn)
                 System.out.println("\n＝再戦が選択されました＝\n");
                 return true;
-            } else if ("N".equalsIgnoreCase(retry)){
+            } else if ("N".equalsIgnoreCase(retry)) {
                 System.out.println("＝ゲームを終了しました＝");
                 return false;
-            }
-            else {
-            System.out.println("YまたはNを入力して下さい。");
+            } else {
+                System.out.println("YまたはNを入力して下さい。");
             }
         }
     }
 
     //８+９．セレクトメニュー（先攻1と後攻2、COM難易度1+2）
-    private static int selectOption(Scanner scanner, String menu,int min,int max) {
+    private static int selectOption(Scanner scanner, String menu, int min, int max) {
         int select = -1;
         while (true) {
             System.out.println(menu);
             System.out.print("番号：");
             if (scanner.hasNextInt()) { //int整数のみ入力可能
                 select = scanner.nextInt();
-                if (min <= select && select <= max){ //min~max数値ならば
+                if (min <= select && select <= max) { //min~max数値ならば
                     break; //受け付けてループ修了
                 }
-            }
-            else { //それ以外の値ならば
+            } else { //それ以外の値ならば
                 System.out.println("\n＝その値は無効です、" + min + "～" + max + "のみです＝\n");
                 scanner.nextLine();//無効な誤入力を読み捨てる（バッファクリア）
             }
@@ -152,7 +148,7 @@ public class NewGame {
                     masu[i][j] = kari;//勝てないなら盤面を戻してマスをチェック
                 }
             }
-        }//相手が勝ちそうな場所を防ぐ
+        } //相手が勝ちそうな場所を防ぐ
         for (int i = 0; i < masu.length; i++) {
             for (int j = 0; j < masu[i].length; j++) {
                 if (masu[i][j] != PLAYER_O && masu[i][j] != PLAYER_X) {//OX以外のマスへ
@@ -191,7 +187,7 @@ public class NewGame {
         }
         return -99; //来ないはず
     }
-    
+
     //５．勝利判定メソッド
 
     //５．勝利判定＋メソッド
@@ -213,7 +209,6 @@ public class NewGame {
         }
         return false; //揃わなければ戻る
     }
-
 
     //５．引き分け判定メソッド
     public static boolean checkDraw(int[][] masu) {
