@@ -19,7 +19,6 @@ public class NewGame {
         Scanner scanner = new Scanner(System.in);
         do { //do内でゲーム進行
             gameBox(scanner);
-            scanner.nextLine();
         } while (playAgain(scanner)); //trueで再戦
         scanner.close();
     }
@@ -59,7 +58,8 @@ public class NewGame {
                 System.out.println("番号1～9を入力して下さい（0=強制終了）。");
                 System.out.print("番号：");
                 inputNum = scanner.nextInt(); //外部入力受付、プレイヤーが入力する数字
-                //６．COMの処理
+                scanner.nextLine();
+            //６．COMの処理
             } else {
                 if (selectCom == 1) { //COMの難易度を決める
                     inputNum = getWeakCom(masu, isPlayerTurn); //弱いCOM=1選択時
@@ -113,7 +113,6 @@ public class NewGame {
         }
     }
 
-
     //８+９．セレクトメニュー（先攻1と後攻2、COM難易度1+2）
     private static int selectOption(Scanner scanner, String menu,int min,int max) {
         int select = -1;
@@ -135,6 +134,7 @@ public class NewGame {
         return select; //入力数値を戻す
     }
 
+    //７．強いCOMメソッド
     //７．強いCOMメソッド
     public static int getStrongCom(int[][] masu, boolean isPlayerTurn) {
         int comValue = isPlayerTurn ? PLAYER_O : PLAYER_X;//三項演算子でCOMターンにO(-1)orX(-2)代入
@@ -178,7 +178,6 @@ public class NewGame {
     }
 
     //６．弱いCOMメソッド
-    //６．順番に置く弱いCOM
     public static int getWeakCom(int[][] masu, boolean isPlayerTurn) {
         if (checkDraw(masu)) { //COMが置けない場合は引き分け判定へ
             return -99;
@@ -192,7 +191,8 @@ public class NewGame {
         }
         return -99; //来ないはず
     }
-
+    
+    //５．勝利判定メソッド
 
     //５．勝利判定＋メソッド
     public static boolean checkWinner(int[][] masu, int playerValue) {
@@ -214,6 +214,7 @@ public class NewGame {
         return false; //揃わなければ戻る
     }
 
+
     //５．引き分け判定メソッド
     public static boolean checkDraw(int[][] masu) {
         for (int i = 0; i < masu.length; i++) {
@@ -227,8 +228,6 @@ public class NewGame {
     }
 
     //３．入力判定メソッド
-
-    //３．入力判定メソッド
     private static boolean tryPlace(int[][] masu, int inputNum, boolean isPlayerTurn) {
         for (int i = 0; i < masu.length; i++) { //1行～3行
             for (int j = 0; j < masu[i].length; j++) { //1列～3列
@@ -240,8 +239,6 @@ public class NewGame {
         }
         return false; //入力失敗
     }
-
-    //２．盤面表示メソッド
 
     //２．盤面表示メソッド
     public static void printBoard(int[][] masu) {
