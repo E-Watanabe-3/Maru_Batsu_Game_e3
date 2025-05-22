@@ -10,12 +10,25 @@ public class NewGame {
     //９．定数としてプレイヤーＯ(-1)と×(-2)を追加
     private static final int PLAYER_O = -1;
     private static final int PLAYER_X = -2;
+
+    
     
     //mainメソッド
     public static void main(String[] args) {
+      //３．入力受付
+        Scanner scanner = new Scanner(System.in);
+        do { //do内でゲーム進行
+            gameBox(scanner);
+            scanner.nextLine();
+        } while (playAgain(scanner)); //trueで再戦
+        scanner.close();
+    }
+
+    //１０．再戦用にゲームループを別メソッドへ
+    public static void gameBox(Scanner scanner) {
         // １．ゲーム開始（タイトル）
-        System.out.println("＝〇×ゲームへようこそ＝");
-        System.out.println("ルール…〇と×を交互に置き、一列揃えた方の勝ちです。");
+        System.out.println("＝＝〇×ゲームへようこそ＝＝");
+        System.out.println("〇と×を交互に置き、一列揃えた方の勝ちです！");
         // ２．表示（枠線と数字）3x3盤面初期化
         int[][] masu = new int[VERTICAL][HORIZONTAL]; //2次元配列[][]=定数代入
 
@@ -27,19 +40,17 @@ public class NewGame {
         }
         printBoard(masu); // masu代入処理後の盤面表示
 
-        //３．入力受付
-        Scanner scanner = new Scanner(System.in); // 入力受付開始
-        
         //９．先攻1or後攻2の選択
         int selectTurn = selectOption(scanner,"先攻/後攻を選択して下さい。\n先攻：１\n後攻：２", 1, 2);
         boolean isPlayerChoice = (selectTurn == 1); //true先攻
-        boolean isPlayerTurn = isPlayerChoice; //最初のターンを固定true/false
+        boolean isPlayerTurn = isPlayerChoice; //最初のターンを代入true/false
         //８．COM難易度1or2の選択
         int selectCom = selectOption(scanner,"\nCOMの難易度を選択して下さい。\n簡単：１\n難しい：２",1 ,2);
         System.out.println("\n＝ゲームを開始します＝");
+        printBoard(masu);
 
         //４．ゲームのループ
-       // boolean isPlayerTurn = true; //OvsX->2つ=boolean型true(O)/false(X)の2種で管理が容易
+        // boolean isPlayerTurn = true; //OvsX->2つ=boolean型true(O)/false(X)の2種で管理が容易
         while (true) {
             //三項演算子（変数A = B > C ? true : false）でif文が省略できる
             System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの番です。");
@@ -48,7 +59,7 @@ public class NewGame {
                 System.out.println("番号1～9を入力して下さい（0=強制終了）。");
                 System.out.print("番号：");
                 inputNum = scanner.nextInt(); //外部入力受付、プレイヤーが入力する数字
-            //６．COMの処理
+                //６．COMの処理
             } else {
                 if (selectCom == 1) { //COMの難易度を決める
                     inputNum = getWeakCom(masu, isPlayerTurn); //弱いCOM=1選択時
@@ -62,7 +73,7 @@ public class NewGame {
                 break; //whileループ停止
             }
             if (inputNum == -99) { //置ける場所がないなら-99を返した場合
-                System.out.println("＝置く場所がないため、ゲームを終了しました＝");
+                System.out.println("＝置けるマスがないため、ゲームを終了しました＝");
                 break;
             }
             //入力+入力判定の呼び出しと、値が無効な場合の処理
@@ -71,42 +82,60 @@ public class NewGame {
                 continue; //ループのスタート地点へ
             }
             printBoard(masu); //盤面更新
-          //勝ち判定メソッド呼び出す
+            //勝利判定の呼び出し
             if (checkWinner(masu, isPlayerTurn ? PLAYER_O : PLAYER_X)) { //true(-1):false(-2)=O:X
                 System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの勝ちです！");
-                System.out.println("＝〇×ゲームを終了しました＝");
                 break;
-            }
-            //勝者がいない、かつ空白がない場合
+            }//引き分け判定の呼び出し
             if (checkDraw(masu)) {
-                System.out.println("引き分けです。\n＝〇×ゲームを終了しました＝");
+                System.out.println("引き分けです。");
                 break;
             }
             isPlayerTurn = !isPlayerTurn; //!=倫理否定演算子でfalseで返しターン交代
         }
-        scanner.close(); // 入力受付終了
     }
     
+    //１０．再戦メソッド
+    private static boolean playAgain(Scanner scanner) {
+        while(true) {
+            System.out.print("\n再戦しますか？\n(Y/N)：");
+            String retry = scanner.nextLine();
+            if("Y".equalsIgnoreCase(retry)) {//.equalsIgnoreCase()大文字小文字区別しない(YyNn)
+                System.out.println("\n＝再戦が選択されました＝\n");
+                return true;
+            } else if ("N".equalsIgnoreCase(retry)){
+                System.out.println("＝ゲームを終了しました＝");
+                return false;
+            }
+            else {
+            System.out.println("YまたはNを入力して下さい。");
+            }
+        }
+    }
+
+
     //８+９．セレクトメニュー（先攻1と後攻2、COM難易度1+2）
     private static int selectOption(Scanner scanner, String menu,int min,int max) {
         int select = -1;
         while (true) {
             System.out.println(menu);
             System.out.print("番号：");
-            if (scanner.hasNextInt()); //int整数のみ入力可能
+            if (scanner.hasNextInt()) { //int整数のみ入力可能
                 select = scanner.nextInt();
                 if (min <= select && select <= max){ //min~max数値ならば
                     break; //受け付けてループ修了
                 }
-                else { //それ以外の値ならば
-                    scanner.nextLine();//無効な誤入力を読み捨てる（バッファクリア）
-                }
-                System.out.println("無効な入力です、" + min + "～" + max + "の数字を入力して下さい。");
+            }
+            else { //それ以外の値ならば
+                System.out.println("\n＝その値は無効です、" + min + "～" + max + "のみです＝\n");
+                scanner.nextLine();//無効な誤入力を読み捨てる（バッファクリア）
+            }
+
         }
-    return select; //入力数値を戻す
+        return select; //入力数値を戻す
     }
-    
-    //７．強いCOMを追加
+
+    //７．強いCOMメソッド
     public static int getStrongCom(int[][] masu, boolean isPlayerTurn) {
         int comValue = isPlayerTurn ? PLAYER_O : PLAYER_X;//三項演算子でCOMターンにO(-1)orX(-2)代入
         int playerValue = isPlayerTurn ? PLAYER_X : PLAYER_O;//逆の値（プレイヤー側の仮の値）代入
@@ -147,7 +176,8 @@ public class NewGame {
         }
         return -99; // 置ける場所がない場合
     }
-    
+
+    //６．弱いCOMメソッド
     //６．順番に置く弱いCOM
     public static int getWeakCom(int[][] masu, boolean isPlayerTurn) {
         if (checkDraw(masu)) { //COMが置けない場合は引き分け判定へ
@@ -162,6 +192,7 @@ public class NewGame {
         }
         return -99; //来ないはず
     }
+
 
     //５．勝利判定＋メソッド
     public static boolean checkWinner(int[][] masu, int playerValue) {
@@ -194,7 +225,7 @@ public class NewGame {
         }
         return true;
     }
-    
+
     //３．入力判定メソッド
 
     //３．入力判定メソッド
@@ -211,7 +242,7 @@ public class NewGame {
     }
 
     //２．盤面表示メソッド
-    
+
     //２．盤面表示メソッド
     public static void printBoard(int[][] masu) {
         System.out.println("+---+---+---+"); //最上部の横線
