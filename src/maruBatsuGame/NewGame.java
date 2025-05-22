@@ -5,8 +5,8 @@ import java.util.Scanner; //外部入力
 public class NewGame {
 
     //クラスにfinal修飾子の定数宣言し配列数を3x3指定(マジックナンバー対策)
-    private static final int VERTICAL = 3; //盤面縦の行数_定数へ要素数代入
-    private static final int HORIZONTAL = 3; //盤面横の列数
+    private static final int VERTICAL = 5; //盤面縦の行数_定数へ要素数代入
+    private static final int HORIZONTAL = 5; //盤面横の列数
     //９．定数としてプレイヤーＯ(-1)と×(-2)を追加
     private static final int PLAYER_O = -1;
     private static final int PLAYER_X = -2;
