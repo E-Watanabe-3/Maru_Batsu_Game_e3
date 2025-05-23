@@ -15,7 +15,7 @@ public class NewGame {
     public static void main(String[] args) {
         //３．入力受付
         Scanner scanner = new Scanner(System.in);
-        do { //do内でゲーム進行
+        do { //do内で1回は必ず処理するゲーム進行
             gameBox(scanner);
         } while (playAgain(scanner)); //trueで再戦
         scanner.close();
@@ -38,8 +38,8 @@ public class NewGame {
         printBoard(masu); // masu代入処理後の盤面表示
 
         //９．先攻1or後攻2の選択
-        int selectTurn = selectOption(scanner, "先攻/後攻を選択して下さい。\n先攻：１\n後攻：２", 1, 2);
-        boolean isPlayerChoice = (selectTurn == 1); //true先攻
+        int selectTurn = selectOption(scanner, "\n先攻/後攻を選択して下さい。\n先攻：１\n後攻：２", 1, 2);
+        boolean isPlayerChoice = (selectTurn == 1); //OvsX->2つ=boolean型true(O)/false(X)の2種で管理が容易
         boolean isPlayerTurn = isPlayerChoice; //最初のターンを代入true/false
         //８．COM難易度1or2の選択
         int selectCom = selectOption(scanner, "\nCOMの難易度を選択して下さい。\n簡単：１\n難しい：２", 1, 2);
@@ -47,7 +47,6 @@ public class NewGame {
         printBoard(masu);
 
         //４．ゲームのループ
-        // boolean isPlayerTurn = true; //OvsX->2つ=boolean型true(O)/false(X)の2種で管理が容易
         while (true) {
             //三項演算子（変数A = B > C ? true : false）でif文が省略できる
             System.out.println((isPlayerTurn ? "〇" : "×") + "プレイヤーの番です。");
@@ -57,7 +56,7 @@ public class NewGame {
                 System.out.print("番号：");
                 inputNum = scanner.nextInt(); //外部入力受付、プレイヤーが入力する数字
                 scanner.nextLine();
-                //６．COMの処理
+            //６．COMの処理
             } else {
                 if (selectCom == 1) { //COMの難易度を決める
                     inputNum = getWeakCom(masu, isPlayerTurn); //弱いCOM=1選択時
@@ -77,7 +76,7 @@ public class NewGame {
             //入力+入力判定の呼び出しと、値が無効な場合の処理
             if (!tryPlace(masu, inputNum, isPlayerTurn)) { //!異なる入力値の場合
                 System.out.println("＝無効な入力です、他の番号を入力してください＝");
-                continue; //ループのスタート地点へ
+                continue; //以降の処理をスキップ＝ループのスタート地点へ
             }
             printBoard(masu); //盤面更新
             //勝利判定の呼び出し
@@ -86,15 +85,15 @@ public class NewGame {
                 break;
             } //引き分け判定の呼び出し
             if (checkDraw(masu)) {
-                System.out.println("引き分けです。");
+                System.out.println("引き分けです！");
                 break;
             }
             isPlayerTurn = !isPlayerTurn; //!=倫理否定演算子でfalseで返しターン交代
         }
     }
 
-    //１０．再戦メソッド
-    private static boolean playAgain(Scanner scanner) {
+    //１０．再戦メソッド（while文ver）
+    /*private static boolean playAgain(Scanner scanner) {
         while (true) {
             System.out.print("\n再戦しますか？\n(Y/N)：");
             String retry = scanner.nextLine();
@@ -107,6 +106,23 @@ public class NewGame {
             } else {
                 System.out.println("YまたはNを入力して下さい。");
             }
+        }
+    }*/
+    
+  //１０．再戦メソッド(switch文ver)
+    private static boolean playAgain(Scanner scanner) {
+        System.out.print("\n再戦しますか？\n(Y/N)：");
+        String retry =  scanner.nextLine().toUpperCase();//.toUpperCase＝小文字を大文字へ自動変換
+        switch(retry) {
+            case "Y":
+                System.out.println("\n＝再戦が選択されました＝\n");
+                return true;
+            case "N":
+                System.out.println("＝ゲームを終了しました＝");
+                return false;
+            default:
+                System.out.println("\n＝YまたはNを入力して下さい＝");
+                return playAgain(scanner);
         }
     }
 
@@ -130,7 +146,6 @@ public class NewGame {
         return select; //入力数値を戻す
     }
 
-    //７．強いCOMメソッド
     //７．強いCOMメソッド
     public static int getStrongCom(int[][] masu, boolean isPlayerTurn) {
         int comValue = isPlayerTurn ? PLAYER_O : PLAYER_X;//三項演算子でCOMターンにO(-1)orX(-2)代入
@@ -187,8 +202,6 @@ public class NewGame {
         }
         return -99; //来ないはず
     }
-
-    //５．勝利判定メソッド
 
     //５．勝利判定＋メソッド
     public static boolean checkWinner(int[][] masu, int playerValue) {
