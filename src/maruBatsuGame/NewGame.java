@@ -11,6 +11,7 @@ public class NewGame {
     private static final int PLAYER_O = -1;
     private static final int PLAYER_X = -2;
     private static final int PLAYER_V = 999;
+    private static final int PLAYER_B = 123;
 
     //mainメソッド
     public static void main(String[] args) {
