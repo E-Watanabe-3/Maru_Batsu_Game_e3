@@ -10,6 +10,7 @@ public class NewGame {
     //９．定数としてプレイヤーＯ(-1)と×(-2)を追加
     private static final int PLAYER_O = -1;
     private static final int PLAYER_X = -2;
+    private static final int PLAYER_B = 123;
 
     //mainメソッド
     public static void main(String[] args) {
